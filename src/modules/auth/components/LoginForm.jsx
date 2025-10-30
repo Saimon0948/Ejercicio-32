@@ -3,26 +3,39 @@ import Input from './Input';
 import Button from './Button';
 import { useState } from 'react';
 import { login } from '../services/login';
+import { useNavigate } from 'react-router-dom';
 
 function LoginForm() {
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({ defaultValues: { username: '', password: '' } });
 
+  
+
   const onValid = async (formData) => {
     try {
+
+
+
       const { data, error } = await login(formData.username, formData.password);
 
       if (error) {
         setErrorMessage(error.frontendErrorMessage);
-
         return;
       }
 
-      console.log(data);
+      // Guardar el token en localStorage
+      localStorage.setItem('token', data.token);
+      
+  console.log(data.token);
+
+  // Redirigir a la página /app donde se renderiza Dashboard
+  navigate('/app');
+
 
     } catch (error) {
       console.error(error);
@@ -59,7 +72,7 @@ function LoginForm() {
         type='password'
         error={errors.password?.message}
       />
-
+    
       <Button type='submit'>Iniciar Sesión</Button>
       {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
     </form>
